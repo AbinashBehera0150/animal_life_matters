@@ -1,0 +1,52 @@
+/*
+Pages/TrackPage.css
+*/
+.track-container {
+  text-align: center;
+  margin-top: 80px;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+.track-container h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #2a7f62;
+}
+
+.track-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.track-form input {
+  width: 280px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  font-size: 1rem;
+}
+
+.track-form button {
+  background-color: #2a7f62;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.track-form button:hover {
+  background-color: #256c53;
+}
+
+.status-message {
+  margin-top: 25px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #444;
+}

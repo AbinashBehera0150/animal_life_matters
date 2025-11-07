@@ -1,0 +1,70 @@
+// Pages/AdminLoginPage.js
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../api/axios";
+import { auth, provider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+
+const AdminLoginPage = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleGoogleLogin = async () => {
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const uid = user.uid;
+      const name = user.displayName || "";
+      const email = user.email || "";
+
+      // Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Send token to backend for login & role check
+      const { data } = await API.post("/users/googleLogin", { idToken });
+
+      if (!data.token) {
+        throw new Error("No token received from backend");
+      }
+
+      // Store JWT and role
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+
+      // Check if the user is admin
+      if (data.role !== "admin") {
+        setErrorMsg("Access denied: You are not an admin.");
+      } else {
+        navigate("/admin-page", {
+          state: { uid, name, email },
+        });
+      }
+    } catch (err) {
+      console.error("Admin login failed:", err);
+      setErrorMsg(err?.response?.data?.message || err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h2>Admin Login</h2>
+      <button
+        onClick={handleGoogleLogin}
+        className="btn google-btn"
+        disabled={loading}
+      >
+        {loading ? "Signing in..." : "Sign in with Google"}
+      </button>
+      {errorMsg && <div className="error-block"><p>{errorMsg}</p></div>}
+    </div>
+  );
+};
+
+export default AdminLoginPage;
