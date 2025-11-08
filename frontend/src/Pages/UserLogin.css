@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap");
+
+.user-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #a8edea, #fed6e3);
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+@keyframes userFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-login-card {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 60px 70px;
+  border-radius: 25px;
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 560px;
+  animation: userFloatIn 1.1s ease-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.user-login-card:hover {
+  transform: scale(1.02);
+}
+
+.user-login-card h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 2.4rem;
+  color: #222;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+}
+
+.user-login-card p {
+  font-size: 1.05rem;
+  color: #555;
+  margin-bottom: 35px;
+  line-height: 1.7;
+}
+
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  opacity: 0.95;
+}
+
+.user-btn {
+  background-color: #4caf50;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.35);
+}
+
+.error {
+  margin-top: 24px;
+  background: rgba(255, 76, 76, 0.12);
+  border-radius: 10px;
+  padding: 12px 18px;
+  color: #d84343;
+  font-weight: 500;
+}

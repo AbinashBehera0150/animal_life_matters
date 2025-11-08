@@ -4,6 +4,7 @@ import API from "../api/axios";
 import { auth, provider, db } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import "./UserLogin.css";
 
 const UserLoginPage = () => {
   const navigate = useNavigate();
@@ -22,7 +23,6 @@ const UserLoginPage = () => {
       const name = user.displayName || "";
       const email = user.email || "";
 
-      // Ensure role exists in Firestore
       const roleRef = doc(db, "roles", uid);
       const roleSnap = await getDoc(roleRef);
       let role = "user";
@@ -32,19 +32,16 @@ const UserLoginPage = () => {
         role = roleSnap.data()?.role || "user";
       }
 
-      // Get backend JWT
       const idToken = await user.getIdToken();
       const { data } = await API.post("/users/googleLogin", { idToken });
 
       if (!data?.token) throw new Error("No token from backend");
 
-      // ✅ Save token, user info, and role in localStorage
       const userData = { uid, name, email, role };
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", role);
 
-      // ✅ Redirect user to home
       navigate("/user-home", { state: userData, replace: true });
     } catch (err) {
       console.error(err);
@@ -55,12 +52,24 @@ const UserLoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>User Login</h2>
-      <button onClick={handleGoogleLogin} disabled={loading}>
-        {loading ? "Signing in..." : "Sign in with Google"}
-      </button>
-      {errorMsg && <p className="error">{errorMsg}</p>}
+    <div className="user-login-container">
+      <div className="user-login-card">
+        <h1>🐾 Welcome Back</h1>
+        <p>
+          Sign in with your Google account to report rescues, track updates, and
+          support our mission to save more animals.
+        </p>
+
+        <button
+          onClick={handleGoogleLogin}
+          className="btn user-btn"
+          disabled={loading}
+        >
+          {loading ? "Signing in..." : "Sign in with Google"}
+        </button>
+
+        {errorMsg && <p className="error">{errorMsg}</p>}
+      </div>
     </div>
   );
 };

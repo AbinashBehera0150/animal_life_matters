@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
+import "./AdminLogin.css";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
@@ -53,16 +54,28 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>Admin Login</h2>
-      <button
-        onClick={handleGoogleLogin}
-        className="btn google-btn"
-        disabled={loading}
-      >
-        {loading ? "Signing in..." : "Sign in with Google"}
-      </button>
-      {errorMsg && <div className="error-block"><p>{errorMsg}</p></div>}
+    <div className="admin-login-container">
+      <div className="admin-login-card">
+        <h1>🐾 Admin Access</h1>
+        <p>
+          Sign in with your authorized Google account to manage rescue
+          operations and support teams in the field.
+        </p>
+
+        <button
+          onClick={handleGoogleLogin}
+          className="btn google-btn"
+          disabled={loading}
+        >
+          {loading ? "Signing in..." : "Sign in with Google"}
+        </button>
+
+        {errorMsg && (
+          <div className="error-block">
+            <p>{errorMsg}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
