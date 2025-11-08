@@ -1,10 +1,14 @@
-// Components/StatusTracker
+// Components/StatusTracker.js
 import React, { useEffect, useState } from "react";
 import API from "../api/axios";
+import PhotoModal from "./PhotoModal";
+import "./StatusTracker.css";
 
 const StatusTracker = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPhotos, setSelectedPhotos] = useState(null);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -24,105 +28,195 @@ const StatusTracker = () => {
     fetchReports();
   }, []);
 
-  if (loading) return <p className="text-gray-600">Loading reports...</p>;
+  // Extract structured info from description
+  const parseDescription = (description) => {
+    const nameMatch = description?.match(/Reporter:\s*([^\.]+)/i);
+    const contactMatch = description?.match(/Contact:\s*([^\.]+)/i);
+    const colorMatch = description?.match(/Color:\s*([^\.]+)/i);
 
-  if (reports.length === 0)
+    const cleanedDesc = description
+      ?.replace(/Reporter:[^\.]*\.?/i, "")
+      ?.replace(/Contact:[^\.]*\.?/i, "")
+      ?.replace(/Color:[^\.]*\.?/i, "")
+      ?.trim() || "";
+
+    return {
+      reporter: nameMatch?.[1]?.trim() || "N/A",
+      contact: contactMatch?.[1]?.trim() || "N/A",
+      color: colorMatch?.[1]?.trim() || "N/A",
+      description: cleanedDesc
+    };
+  };
+
+  const getStatusClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'status-pending';
+      case 'in progress': return 'status-in-progress';
+      case 'resolved': return 'status-resolved';
+      case 'completed': return 'status-resolved';
+      case 'cancelled': return 'status-cancelled';
+      default: return 'status-pending';
+    }
+  };
+
+  const formatAnimalType = (category) => {
+    if (!category) return "Other";
+    return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+  };
+
+  const handleMapClick = (coordinates) => {
+    if (coordinates) {
+      const [lng, lat] = coordinates;
+      const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+      window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handlePhotoClick = (photos) => {
+    if (photos && photos.length > 0) {
+      setSelectedPhotos(photos);
+      setIsPhotoModalOpen(true);
+    }
+  };
+
+  if (loading) {
     return (
-      <p className="text-gray-600 text-lg">
-        No reports found. Try reporting an animal first!
-      </p>
+      <div className="loading-state">
+        <div className="loading-spinner"></div>
+        <p>Loading your rescue reports...</p>
+      </div>
     );
+  }
+
+  if (reports.length === 0) {
+    return (
+      <div className="empty-state">
+        <div className="empty-icon">📋</div>
+        <h3>No Reports Found</h3>
+        <p>Start by reporting an animal in need of rescue!</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {reports.map((report) => {
-        const latestDesc =
-          report.descriptions?.[report.descriptions.length - 1]?.text || "";
+    <>
+      <div className="status-tracker-container">
+        <table className="status-tracker-table">
+          <thead className="table-header">
+            <tr>
+              <th>Animal Type</th>
+              <th>Description</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Photo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reports.map((report) => {
+              const latestDesc = report.descriptions?.[report.descriptions.length - 1]?.text || "";
+              const parsedInfo = parseDescription(latestDesc);
+              
+              return (
+                <tr key={report._id} className="table-row">
+                  {/* Animal Type Column */}
+                  <td className="table-cell" data-label="Animal Type">
+                    <div className="animal-type-info">
+                      <span className={`animal-category ${report.category?.toLowerCase()}`}>
+                        {formatAnimalType(report.category)}
+                      </span>
+                      {parsedInfo.color !== "N/A" && (
+                        <span className="animal-color">{parsedInfo.color}</span>
+                      )}
+                    </div>
+                  </td>
 
-        // Extract structured info from description
-        const nameMatch = latestDesc.match(/Reporter:\s*([^\.]+)/i);
-        const contactMatch = latestDesc.match(/Contact:\s*([^\.]+)/i);
-        const colorMatch = latestDesc.match(/Color:\s*([^\.]+)/i);
+                  {/* Description Column */}
+                  <td className="table-cell" data-label="Description">
+                    <div className="description-text">
+                      {parsedInfo.description || "No description provided"}
+                    </div>
+                  </td>
 
-        const cleanedDesc = latestDesc
-          .replace(/Reporter:[^\.]*\./i, "")
-          .replace(/Contact:[^\.]*\./i, "")
-          .replace(/Color:[^\.]*\./i, "")
-          .trim();
+                  {/* Location Column */}
+                  <td className="table-cell" data-label="Location">
+                    <div className="location-info">
+                      {report.location?.coordinates ? (
+                        <button 
+                          className="location-button"
+                          onClick={() => handleMapClick(report.location.coordinates)}
+                          title="Open in Google Maps"
+                        >
+                          <span className="coordinates">
+                            {report.location.coordinates[1].toFixed(4)}, 
+                            {report.location.coordinates[0].toFixed(4)}
+                          </span>
+                          <span className="map-icon">📍</span>
+                        </button>
+                      ) : (
+                        <span className="no-location">Location not available</span>
+                      )}
+                    </div>
+                  </td>
 
-        return (
-          <div
-            key={report._id}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200"
-          >
-            {/* Image */}
-            <div className="relative w-full h-56 bg-gray-100 flex items-center justify-center">
-              {report.photos && report.photos.length > 0 ? (
-                <img
-                  src={report.photos[0].url}
-                  alt={report.category}
-                  className="w-full h-full object-cover object-center rounded-t-2xl"
-                />
-              ) : (
-                <p className="text-gray-500 italic">No Photo Available</p>
-              )}
-            </div>
+                  {/* Status Column */}
+                  <td className="table-cell" data-label="Status">
+                    <span className={`status-badge ${getStatusClass(report.status)}`}>
+                      {report.status}
+                    </span>
+                  </td>
 
-            {/* Details */}
-            <div className="p-5">
-              <h2 className="text-2xl font-bold text-green-700 mb-2">
-                {report.category}
-              </h2>
+                  {/* Last Updated Column */}
+                  <td className="table-cell" data-label="Last Updated">
+                    <div className="date-info">
+                      {new Date(report.updatedAt).toLocaleDateString()}
+                      <span className="time-text">
+                        {new Date(report.updatedAt).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </td>
 
-              <div className="space-y-1 text-gray-700 text-sm">
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className="text-green-600 font-medium">
-                    {report.status}
-                  </span>
-                </p>
+                  {/* Photo Column */}
+                  <td className="table-cell" data-label="Photo">
+                    <div className="photo-container">
+                      {report.photos && report.photos.length > 0 ? (
+                        <button 
+                          className="photo-thumbnail-button"
+                          onClick={() => handlePhotoClick(report.photos)}
+                        >
+                          <img
+                            src={report.photos[0].url}
+                            alt={report.category}
+                            className="thumbnail-image"
+                          />
+                          {report.photos.length > 1 && (
+                            <div className="photo-count">
+                              +{report.photos.length - 1}
+                            </div>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="no-photo">
+                          <span className="no-photo-icon">📷</span>
+                          <span className="no-photo-text">No Photo</span>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-                {nameMatch && (
-                  <p>
-                    <strong>Reporter:</strong> {nameMatch[1].trim()}
-                  </p>
-                )}
-                {contactMatch && (
-                  <p>
-                    <strong>Contact:</strong> {contactMatch[1].trim()}
-                  </p>
-                )}
-                {colorMatch && (
-                  <p>
-                    <strong>Color:</strong> {colorMatch[1].trim()}
-                  </p>
-                )}
-
-                {cleanedDesc && (
-                  <p>
-                    <strong>Description:</strong> {cleanedDesc}
-                  </p>
-                )}
-
-                {report.location?.coordinates && (
-                  <p>
-                    <strong>Location:</strong>{" "}
-                    {`${report.location.coordinates[1].toFixed(
-                      4
-                    )}, ${report.location.coordinates[0].toFixed(4)}`}
-                  </p>
-                )}
-
-                <p className="text-xs text-gray-500">
-                  <strong>Last Updated:</strong>{" "}
-                  {new Date(report.updatedAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
+      {/* Photo Modal */}
+      <PhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        photos={selectedPhotos}
+      />
+    </>
   );
 };
 

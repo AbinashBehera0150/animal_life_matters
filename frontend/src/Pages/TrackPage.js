@@ -16,11 +16,34 @@ const TrackPage = () => {
     }
   }, [navigate]);
 
+  const handleBackClick = () => {
+    navigate("/user-home");
+  };
+
   return (
-    <div className="track-container p-6">
-      <h1 className="text-3xl font-bold text-green-700 mb-6">
-        Track Animal Rescue Status 🐾
-      </h1>
+    <div className="track-container">
+      {/* Back Button */}
+      <button 
+        onClick={handleBackClick}
+        className="back-button"
+      >
+        <svg 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M10 19l-7-7m0 0l7-7m-7 7h18" 
+          />
+        </svg>
+        Back to Home
+      </button>
+
+      <h1>Track Animal Rescue Status 🐾</h1>
       <StatusTracker />
     </div>
   );

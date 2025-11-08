@@ -1,0 +1,482 @@
+/* Components/StatusTracker.css */
+.status-tracker-container {
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.status-tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Modern Table Header */
+.table-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-header th {
+  padding: 1.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border: none;
+  position: relative;
+  font-feature-settings: 'calt' off;
+}
+
+.table-header th:first-child {
+  border-top-left-radius: 20px;
+  padding-left: 2rem;
+}
+
+.table-header th:last-child {
+  border-top-right-radius: 20px;
+  padding-right: 2rem;
+}
+
+/* Modern Table Rows - Only scale animation */
+.table-row {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  background: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: linear-gradient(135deg, #f8faff 0%, #f5f7ff 100%);
+  transform: scale(1.02);
+  box-shadow: 
+    0 12px 40px rgba(102, 126, 234, 0.15),
+    0 0 0 1px rgba(102, 126, 234, 0.1);
+}
+
+.table-cell {
+  padding: 1.5rem 1.25rem;
+  font-size: 0.9rem;
+  color: #2d3748;
+  vertical-align: middle;
+  border: none;
+  position: relative;
+  font-weight: 500;
+}
+
+.table-cell:first-child {
+  padding-left: 2rem;
+}
+
+.table-cell:last-child {
+  padding-right: 2rem;
+}
+
+/* Modern Animal Type Styling - NO HOVER EFFECTS */
+.animal-type-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.animal-category {
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* No transition - no hover effect */
+}
+
+.animal-category.dog {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+}
+
+.animal-category.cat {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+.animal-category.other {
+  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+  color: white;
+}
+
+.animal-color {
+  font-size: 0.75rem;
+  color: #718096;
+  background: rgba(113, 128, 150, 0.1);
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(113, 128, 150, 0.2);
+  display: inline-block;
+  backdrop-filter: blur(10px);
+  /* No transition - no hover effect */
+}
+
+/* Modern Description Styling - NO HOVER EFFECTS */
+.description-text {
+  max-width: 200px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #4a5568;
+  font-size: 0.88rem;
+  /* No transition - no hover effect */
+}
+
+/* Modern Location Button - HAS HOVER EFFECT */
+.location-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+}
+
+.location-button:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.location-button:hover .coordinates {
+  color: white;
+}
+
+.location-button:hover .map-icon {
+  transform: scale(1.2);
+}
+
+.coordinates {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: #4a5568;
+  flex: 1;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.no-location {
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+}
+
+/* Modern Status Badge - NO HOVER EFFECTS */
+.status-badge {
+  padding: 0.6rem 1rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  text-align: center;
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  /* No transition - no hover effect */
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  color: white;
+}
+
+.status-in-progress {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+}
+
+.status-resolved {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+.status-cancelled {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+}
+
+/* Modern Date Styling - NO HOVER EFFECTS */
+.date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: rgba(113, 128, 150, 0.05);
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(113, 128, 150, 0.1);
+  /* No transition - no hover effect */
+}
+
+.time-text {
+  font-size: 0.75rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+/* Modern Photo Styling - HAS HOVER EFFECT */
+.photo-container {
+  display: flex;
+  justify-content: center;
+}
+
+.photo-thumbnail-button {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.photo-thumbnail-button:hover {
+  border-color: #667eea;
+  transform: scale(1.1);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.photo-thumbnail-button:hover .thumbnail-image {
+  transform: scale(1.1);
+}
+
+.photo-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border: 2px solid white;
+  /* No transition - no hover effect */
+}
+
+.no-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a0aec0;
+  padding: 1rem;
+  background: rgba(160, 174, 192, 0.05);
+  border-radius: 12px;
+  border: 1px dashed rgba(160, 174, 192, 0.3);
+  /* No transition - no hover effect */
+}
+
+.no-photo-icon {
+  font-size: 1.5rem;
+  opacity: 0.6;
+  /* No transition - no hover effect */
+}
+
+.no-photo-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Modern Loading and Empty States */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #718096;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.loading-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .table-header th {
+    padding: 1.25rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .table-cell {
+    padding: 1.25rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .description-text {
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .status-tracker-container {
+    border-radius: 16px;
+    margin: 0.5rem;
+  }
+  
+  .table-header {
+    display: none;
+  }
+  
+  .table-row {
+    display: block;
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transform: none !important; /* Disable scale on mobile */
+  }
+  
+  .table-row:hover {
+    transform: none !important; /* Disable scale on mobile */
+  }
+  
+  .table-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    text-align: right;
+  }
+  
+  .table-cell:last-child {
+    border-bottom: none;
+  }
+  
+  .table-cell::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #2d3748;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-right: 1rem;
+  }
+  
+  .animal-type-info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .location-button {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-row {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .table-cell {
+    padding: 0.75rem 0;
+    font-size: 0.8rem;
+  }
+  
+  .status-badge {
+    min-width: 80px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.7rem;
+  }
+  
+  .photo-thumbnail-button {
+    width: 60px;
+    height: 60px;
+  }
+}
