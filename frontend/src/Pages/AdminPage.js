@@ -1,5 +1,5 @@
 // Pages/AdminPage.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import "./AdminPage.css";
@@ -9,10 +9,87 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [columnWidths, setColumnWidths] = useState({
+    0: 100,  // ID
+    1: 120,  // Category
+    2: 180,  // Status
+    3: 250,  // Description
+    4: 200,  // Location
+    5: 120,  // Photos
+    6: 120   // Actions
+  });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizingIndex, setResizingIndex] = useState(null);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+  const tableRef = useRef(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+
+  // Mouse move handler
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing || resizingIndex === null) return;
+
+    const table = tableRef.current;
+    if (!table) return;
+
+    // Get table boundaries to prevent overflow
+    const tableRect = table.getBoundingClientRect();
+    const maxWidth = tableRect.width - 50; // Minimum 50px for other columns
+
+    const deltaX = e.clientX - startXRef.current;
+    let newWidth = Math.max(50, startWidthRef.current + deltaX);
+
+    // Prevent table from expanding beyond viewport
+    newWidth = Math.min(newWidth, maxWidth);
+
+    setColumnWidths(prev => ({
+      ...prev,
+      [resizingIndex]: newWidth
+    }));
+  }, [isResizing, resizingIndex]);
+
+  // Mouse up handler
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+    setResizingIndex(null);
+    document.body.style.removeProperty('cursor');
+    document.body.style.removeProperty('user-select');
+  }, []);
+
+  // Add/remove event listeners
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
+
+  // Start resizing - improved to be more intuitive
+  const startResizing = (index, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Get the exact position where the user clicked on the resizer
+    const resizerRect = e.target.getBoundingClientRect();
+    startXRef.current = resizerRect.left + resizerRect.width / 2;
+
+    const th = e.target.parentElement;
+    const rect = th.getBoundingClientRect();
+    startWidthRef.current = rect.width;
+
+    setIsResizing(true);
+    setResizingIndex(index);
+  };
 
   useEffect(() => {
     if (!token || role !== "admin") {
@@ -124,59 +201,134 @@ const AdminPage = () => {
         </label>
       </div>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Description</th>
-            <th>Location</th>
-            <th>Photos</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((r) => (
-            <tr key={r._id}>
-              <td>{r._id}</td>
-              <td>{r.category}</td>
-              <td>
-                <select
-                  value={r.status}
-                  onChange={(e) => updateStatus(r._id, e.target.value)}
-                >
-                  <option value="Yet to be picked">Yet to be picked</option>
-                  <option value="Picked up">Picked up</option>
-                  <option value="In treatment">In treatment</option>
-                  <option value="Treatment done">Treatment done</option>
-                </select>
-              </td>
-              <td>{r.descriptions?.map((d) => d.text).join(", ")}</td>
-              <td>
-                {r.location?.coordinates
-                  ? `Lat: ${r.location.coordinates[1]}, Lng: ${r.location.coordinates[0]}`
-                  : "N/A"}
-              </td>
-              <td>
-                {r.photos?.map((p, i) => (
-                  <a
-                    key={i}
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    📸
-                  </a>
-                ))}
-              </td>
-              <td>
-                <button onClick={() => deleteReport(r._id)}>🗑️ Delete</button>
-              </td>
+      <div className={`table-wrapper ${isResizing ? 'resizing' : ''}`} ref={tableRef}>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th style={{ width: `${columnWidths[0]}px` }}>
+                <div className="th-content">
+                  ID
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(0, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[1]}px` }}>
+                <div className="th-content">
+                  Category
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(1, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[2]}px` }}>
+                <div className="th-content">
+                  Status
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(2, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[3]}px` }}>
+                <div className="th-content">
+                  Description
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(3, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[4]}px` }}>
+                <div className="th-content">
+                  Location
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(4, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[5]}px` }}>
+                <div className="th-content">
+                  Photos
+                  <div
+                    className="resizer"
+                    onMouseDown={(e) => startResizing(5, e)}
+                  />
+                </div>
+              </th>
+              <th style={{ width: `${columnWidths[6]}px` }}>
+                <div className="th-content">
+                  Actions
+                </div>
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {reports.map((r) => (
+              <tr key={r._id}>
+                <td style={{ width: `${columnWidths[0]}px` }}>{r._id}</td>
+                <td style={{ width: `${columnWidths[1]}px` }}>{r.category}</td>
+                <td style={{ width: `${columnWidths[2]}px` }}>
+                  <select
+                    value={r.status}
+                    onChange={(e) => updateStatus(r._id, e.target.value)}
+                  >
+                    <option value="Yet to be picked">Yet to be picked</option>
+                    <option value="Picked up">Picked up</option>
+                    <option value="In treatment">In treatment</option>
+                    <option value="Treatment done">Treatment done</option>
+                  </select>
+                </td>
+                <td style={{ width: `${columnWidths[3]}px` }}>
+                  {r.descriptions?.map((d) => d.text).join(", ")}
+                </td>
+                <td style={{ width: `${columnWidths[4]}px` }}>
+                  {r.location?.coordinates ? (
+                    <div className="location-cell">
+                      <a
+                        href={`https://www.google.com/maps?q=${r.location.coordinates[1]},${r.location.coordinates[0]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="coordinates-link"
+                        title="Open in Google Maps"
+                      >
+                        📍 Lat: {r.location.coordinates[1].toFixed(6)}, Lng: {r.location.coordinates[0].toFixed(6)}
+                      </a>
+                    </div>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+                <td style={{ width: `${columnWidths[5]}px` }}>
+                  <div className="photo-thumbnails">
+                    {r.photos?.map((p, i) => (
+                      <a
+                        key={i}
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="thumbnail-link"
+                      >
+                        <img
+                          src={p.url}
+                          alt={`Report photo ${i + 1}`}
+                          className="thumbnail"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </td>
+                <td style={{ width: `${columnWidths[6]}px` }}>
+                  <button onClick={() => deleteReport(r._id)}>🗑️ Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {reports.length === 0 && <p>No reports found.</p>}
     </div>
