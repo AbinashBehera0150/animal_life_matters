@@ -3,19 +3,20 @@ Pages/Home.css
 */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap');
 
-/* Background setup */
+/* 🌈 Background setup */
 .home-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 140px); /* subtract header + footer */
   background: linear-gradient(120deg, #a8edea, #fed6e3);
   font-family: 'Poppins', sans-serif;
   text-align: center;
   overflow: hidden;
+  margin-top: 80px; /* space for header */
 }
 
-/* Subtle floating animation for content */
+/* ✨ Floating animation */
 @keyframes floatIn {
   0% {
     opacity: 0;
@@ -27,9 +28,9 @@ Pages/Home.css
   }
 }
 
-/* Card styling */
+/* 🧾 Main content card */
 .home-content {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   padding: 60px 80px;
   border-radius: 25px;
   box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
@@ -42,7 +43,7 @@ Pages/Home.css
   transform: scale(1.02);
 }
 
-/* Title styling */
+/* 🐾 Main title */
 .home-content h1 {
   color: #222;
   font-family: 'Playfair Display', serif;
@@ -51,7 +52,7 @@ Pages/Home.css
   letter-spacing: 1px;
 }
 
-/* Paragraph styling */
+/* 📜 Paragraph styling */
 .home-content p {
   font-size: 1.1rem;
   color: #555;
@@ -60,14 +61,14 @@ Pages/Home.css
   font-weight: 400;
 }
 
-/* Buttons container */
+/* 🔘 Button container */
 .button-group {
   display: flex;
   justify-content: center;
   gap: 25px;
 }
 
-/* Common button styles */
+/* Common button style */
 .btn {
   padding: 14px 30px;
   border: none;
@@ -79,14 +80,14 @@ Pages/Home.css
   letter-spacing: 0.5px;
 }
 
-/* User Button */
+/* 🧍 User Button */
 .user-btn {
   background-color: #4caf50;
   color: white;
   box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
 }
 
-/* Admin Button */
+/* 🧑‍💼 Admin Button */
 .admin-btn {
   background-color: #2196f3;
   color: white;
@@ -98,4 +99,77 @@ Pages/Home.css
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   opacity: 0.95;
+}
+
+/* 🏷️ Header section */
+.home-header {
+  width: 100%;
+  padding: 20px 0;
+  background-color: #ffffff;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* 💙 Website title */
+.site-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2b6cb0;
+  letter-spacing: 1px;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+/* 🚑 Emergency contact footer */
+.emergency-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ff4d4f;
+  color: white;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.emergency-footer span {
+  margin-left: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .home-content {
+    padding: 40px 30px;
+    max-width: 90%;
+  }
+
+  .home-content h1 {
+    font-size: 2rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .emergency-footer {
+    font-size: 1rem;
+    padding: 10px 0;
+  }
 }

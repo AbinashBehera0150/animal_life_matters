@@ -38,6 +38,7 @@ const UserLoginPage = () => {
       if (!data?.token) throw new Error("No token from backend");
 
       const userData = { uid, name, email, role };
+      localStorage.clear();
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", role);

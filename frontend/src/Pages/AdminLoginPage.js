@@ -33,9 +33,16 @@ const AdminLoginPage = () => {
         throw new Error("No token received from backend");
       }
 
-      // Store JWT and role
+      /// 🧹 Clear any previous user login
+      localStorage.clear();
+
+      // ✅ Save fresh admin data
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      localStorage.setItem("role", "admin");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ uid, name, email, role: "admin" })
+      );
 
       // Check if the user is admin
       if (data.role !== "admin") {
@@ -47,7 +54,9 @@ const AdminLoginPage = () => {
       }
     } catch (err) {
       console.error("Admin login failed:", err);
-      setErrorMsg(err?.response?.data?.message || err.message || "Login failed");
+      setErrorMsg(
+        err?.response?.data?.message || err.message || "Login failed"
+      );
     } finally {
       setLoading(false);
     }

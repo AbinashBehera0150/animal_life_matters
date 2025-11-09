@@ -1,4 +1,3 @@
-// Pages/ReportPage.js
 import React, { useState, useRef, useEffect } from "react";
 import API from "../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +6,10 @@ import "./UserPage.css";
 const ReportPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { uid, name, email, role, formData: prefillData } = state || {};
+
+  // 🧠 Get initial data from route state or localStorage
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const { uid, name, email, role, formData: prefillData } = state || storedUser || {};
 
   const [formData, setFormData] = useState({
     name: name || "",
@@ -22,27 +24,27 @@ const ReportPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const customCategoryRef = useRef(null);
 
-  // Prefill form if coming from ShowReportsPage
+  // 🧠 Prefill form if coming from ShowReportsPage
   useEffect(() => {
     if (prefillData) {
       setFormData((prev) => ({
         ...prev,
         ...prefillData,
-        photo: null, // always reset photo for new upload
+        photo: null, // always reset photo
       }));
     }
   }, [prefillData]);
 
-  // Redirect if user not logged in
+  // ✅ Check token only (not uid)
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token || !uid) {
+    if (!token) {
       alert("You must log in first.");
       navigate("/user-login");
     }
-  }, [navigate, uid]);
+  }, [navigate]);
 
-  // Autofocus for "Other" category
+  // 🧩 Autofocus for “Other” category
   useEffect(() => {
     if (formData.category === "Other" && customCategoryRef.current) {
       customCategoryRef.current.focus();
@@ -76,7 +78,7 @@ const ReportPage = () => {
 
       return data?.photoUrl || null;
     } catch (err) {
-      console.error("Photo upload error (frontend):", err.response?.data || err.message);
+      console.error("Photo upload error:", err.response?.data || err.message);
       throw new Error("Failed to upload photo. Please try again.");
     }
   };
@@ -87,7 +89,7 @@ const ReportPage = () => {
       /@([0-9.-]+),([0-9.-]+)/,
       /place\/[^\/]+\/@([0-9.-]+),([0-9.-]+)/,
       /maps\?q=([0-9.-]+)$/,
-      /([0-9.-]+),([0-9.-]+)/
+      /([0-9.-]+),([0-9.-]+)/,
     ];
 
     for (const pattern of patterns) {
@@ -148,7 +150,7 @@ const ReportPage = () => {
         return;
       }
 
-      // Check for existing reports nearby
+      // 🔍 Check for existing reports nearby
       try {
         const { data: check } = await API.get("/reports/checkExisting", {
           params: {
@@ -160,7 +162,6 @@ const ReportPage = () => {
         });
 
         if (check?.count > 0 && check?.reports?.length > 0) {
-          // Redirect to ShowReportsPage with nearby reports
           navigate("/show-reports", {
             state: { nearbyReports: check.reports, formData },
           });
@@ -170,15 +171,13 @@ const ReportPage = () => {
         console.warn("Check existing reports failed:", checkErr);
       }
 
-      // Upload photo if provided
+      // 📸 Upload photo if provided
       let photoUrl = null;
       if (formData.photo) {
         try {
           photoUrl = await uploadPhoto(formData.photo);
         } catch (photoErr) {
-          const proceed = window.confirm(
-            "Photo upload failed. Continue without photo?"
-          );
+          const proceed = window.confirm("Photo upload failed. Continue without photo?");
           if (!proceed) {
             restoreButton();
             return;
@@ -186,7 +185,7 @@ const ReportPage = () => {
         }
       }
 
-      // Submit report
+      // 📨 Submit report
       const { data } = await API.post(
         "/reports/create",
         {
@@ -195,7 +194,7 @@ const ReportPage = () => {
           photoUrl,
           latitude: coords.lat,
           longitude: coords.lng,
-          firebaseUid: uid,
+          firebaseUid: uid || storedUser?.uid,
           name: formData.name,
           contact: formData.contact,
         },
@@ -221,9 +220,7 @@ const ReportPage = () => {
 
       restoreButton();
 
-      // 🔹 Redirect to home page after successful submission
       navigate("/user-home");
-
     } catch (err) {
       console.error("Submit error:", err);
       alert(err?.response?.data?.message || err.message || "Submission failed.");
@@ -234,6 +231,7 @@ const ReportPage = () => {
   return (
     <div className="user-container">
       <h1>🐾 Report an Injured / Stray Animal</h1>
+
       <form className="report-form" onSubmit={handleSubmit}>
         <label>Reporter's Name*:</label>
         <input
@@ -258,7 +256,12 @@ const ReportPage = () => {
         />
 
         <label>Category:</label>
-        <select name="category" onChange={handleChange} value={formData.category} required>
+        <select
+          name="category"
+          onChange={handleChange}
+          value={formData.category}
+          required
+        >
           <option value="">Select Category</option>
           <option value="Dog">Dog</option>
           <option value="Cat">Cat</option>
